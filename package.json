@@ -30,7 +30,6 @@
     "babel-plugin-transform-function-bind": "^6.8.0",
     "babel-plugin-transform-object-rest-spread": "^6.8.0",
     "babel-preset-env": "^1.4.0",
-    "debug": "^2.6.4",
     "mocha": "^3.3.0",
     "simple-plist": "^0.2.1"
   },

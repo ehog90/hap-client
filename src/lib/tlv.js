@@ -1,5 +1,3 @@
-const debug = require('debug')('hap-client:tlv');
-
 /**
  * Type Length Value encoding/decoding, used by HAP as a wire format.
  * https://en.wikipedia.org/wiki/Type-length-value
@@ -47,11 +45,9 @@ function encode(...args /* type, data, type, data... */) {
     while (([ type, data, ...args ] = args) && (typeof type !== 'undefined')) {
         // coerce data to Buffer if needed
         if (typeof data === 'number') {
-            debug("turning %d into buffer", data);
             data = Buffer.from([ data ]);
         }
         else if (typeof data === 'string') {
-            debug("turning %s into buffer", data);
             data = Buffer.from(data);
         }
 
@@ -59,9 +55,6 @@ function encode(...args /* type, data, type, data... */) {
         let pos = 0;
         while (data.length - pos > 0) {
             let len = Math.min(data.length - pos, 255);
-
-            debug(`adding ${len} bytes of type ${type} to the buffer starting at ${pos}`);
-
             encodedTLVBuffer =
                 encodedTLVBuffer
                     ::append(

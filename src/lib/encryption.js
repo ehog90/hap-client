@@ -2,8 +2,6 @@ import { api as Sodium } from 'sodium';
 
 import { UInt53toBufferLE } from './number';
 
-const debug = require('debug')('encryption');
-
 function computePoly1305(cipherText, AAD, nonce, key) {
     if (AAD == null) {
         AAD = Buffer.alloc(0);

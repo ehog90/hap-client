@@ -1,9 +1,6 @@
 import { Observable } from 'rxjs';
 import {setPassword, getPassword} from "./json-store";
 
-//import Keytar from 'keytar';
-
-
 function loadClient(clientName) {
     return Observable
         .defer(

@@ -1,11 +1,7 @@
 import BufferReader from 'buffer-reader';
-
 import enc from './encryption';
 import { remaining } from './bufferreader';
 import { UInt53toBufferLE } from './number';
-
-const debug = require('debug')('crypto');
-
 class Cryptographer
 {
     constructor(encryptKey, decryptKey) {
@@ -62,8 +58,6 @@ class Cryptographer
                 const AAD = packet.nextBuffer(2);
                 const trueLength = AAD.readUInt16LE(0);
                 const availableSize = packet::remaining() - 16; // 16 is the size of the HMAC
-
-                debug(`need ${trueLength} bytes and have ${availableSize} bytes`);
                 if (trueLength > availableSize) {
                     // The packet is bigger than the available data; wait till more comes in
                     break;
@@ -86,8 +80,6 @@ class Cryptographer
                 }
                 else
                 {
-                    debug('decryption failed');
-                    debug('packet: %s', packet.buf.toString('hex'));
                     return null;
                 }
             }

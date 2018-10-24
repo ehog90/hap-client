@@ -13,15 +13,11 @@ import {
 import tlv from './lib/tlv';
 
 import { splitGen as split } from './lib/string';
-
-const debug = require('debug')('hap-client:http');
-
 function readChunk() {
     // read one line
     let size = this::nextLine(), chunk = '';
     if (size) {
         size = parseInt(size, 16);
-        debug(`reading ${size} bytes for chunk`);
         if (size > 0) {
             if (size < (this.offset + this.buf.length)) {
                 chunk = this.nextBuffer(size);
@@ -128,8 +124,6 @@ class EventedHttpClient
         return Observable
             .defer(
                 () => {
-                    debug(`requesting: ${method} ${url}`);
-
                     let request = {
                         method,
                         url,
@@ -164,9 +158,6 @@ class EventedHttpClient
 
                                 request.body
                             ]);
-
-                    debug("raw request: %s", outgoing.toString('hex'));
-
                     outgoing =
                         this
                             ::runMiddleware(
@@ -174,12 +165,7 @@ class EventedHttpClient
                                 outgoing
                             );
 
-                    debug("raw request (post middleware): %s", outgoing.toString('hex'));
-
                     this._socket.send(outgoing);
-
-                    debug("Request sent");
-
                     return this
                         .messages
                         .filter(x => x.type !== 'EVENT/1.0')
@@ -189,13 +175,11 @@ class EventedHttpClient
     }
 
     get(url, headers = {}) {
-        debug("GETing %s", url);
         return this
             .request('GET', url, headers);
     }
 
     post(url, buffer, contentType = 'application/json', headers = {}) {
-        debug("POSTing to %s: %o", url, buffer);
         return this
             .request('POST', url, {
                 ['Content-Type']:   contentType,
@@ -205,7 +189,6 @@ class EventedHttpClient
     }
 
     put(url, data, contentType = 'application/json', headers = {}) {
-        debug("PUTing %s: %o", url, data);
         let  encoder;
         if (encoder = Encoders[contentType]) {
             data = encoder(data);
@@ -258,9 +241,6 @@ class EventedHttpClient
 
             if (match = statusRe.exec(line)) {
                 let [, messageType, version, status, statusText ] = match;
-
-                debug(`status: ${messageType}, ${version}, ${status}, ${statusText}`);
-
                 let idx = -1, headers = {};
                 while ((idx = buffer::indexOf("\r\n")) > 0) {
                     let header = buffer::nextLine();
@@ -278,19 +258,15 @@ class EventedHttpClient
                     // is there a content length header?
                     if (headers['content-length']) {
                         let len = parseInt(headers['content-length']);
-                        debug(`Reading ${len} bytes for body...`);
-                        debug(`There are ${buffer::remaining()} bytes left in the buffer`);
                         if (buffer::remaining() >= len) {
                             body.append(buffer.nextBuffer(len));
                         } else {
                             // the whole message is not in the buffer
                             // wait till next time
-                            debug('partial message; returning');
                             return [ [], buffer.buf ];
                         }
                     } else if (headers['transfer-encoding'].toLowerCase() === 'chunked') {
                         // TODO: read chunked encoding
-                        debug(`Reading chunked bytes for body`);
 
                         let chunkInfo;
                         while (chunkInfo = buffer::readChunk()) {
@@ -298,12 +274,10 @@ class EventedHttpClient
                             if (declaredSize) {
                                 if (chunk) {
                                     body.append(chunk);
-                                    debug('read chunk sized ' + declaredSize);
                                 }
                                 else {
                                     // the whole message is not in the buffer
                                     // wait till next time
-                                    debug('partial message; returning');
                                     return [ [], buffer.buf ];
                                 }
                             }
@@ -321,14 +295,10 @@ class EventedHttpClient
                         // buffer.move(2);
                     }
                 }
-
-                debug('finished reading');
-
                 let contentType, decoder;
                 if ((contentType = headers['content-type'])
                         && (decoder = Decoders[contentType]))
                 {
-                    debug('parsing body');
                     body = decoder(body);
                 }
 
@@ -343,8 +313,6 @@ class EventedHttpClient
         }
 
         buffer::seekToMark();
-        debug(`returning from ${buffer.offset} to ${buffer.buf.length}`);
-
         return [ messages, buffer.restAll() ];
     }
 }
