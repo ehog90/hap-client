@@ -1,14 +1,14 @@
 import { Observable } from 'rxjs';
-import Keytar from 'keytar';
+import {setPassword, getPassword} from "./json-store";
 
-const debug = require('debug')('hap-client:securestore');
+//import Keytar from 'keytar';
+
 
 function loadClient(clientName) {
     return Observable
         .defer(
             () =>
-                Keytar
-                    .getPassword(clientName, 'clientInfo')
+                getPassword(clientName, 'clientInfo')
         )
         .map(
             json =>
@@ -17,8 +17,7 @@ function loadClient(clientName) {
 }
 
 function saveClient(self) {
-    return Keytar
-        .setPassword(
+    return setPassword(
             self._clientName,
             'clientInfo',
             JSON.stringify(self)
@@ -27,11 +26,9 @@ function saveClient(self) {
 }
 
 function load(clientName, username) {
-    debug(`loading for ${clientName}/${username}`);
     return Observable
         .from(
-            Keytar
-                .getPassword(clientName, username)
+            getPassword(clientName, username)
         )
         .map(
             json =>
@@ -41,10 +38,7 @@ function load(clientName, username) {
 }
 
 function save(self) {
-    debug(`saving for ${self._clientName}/${self.user}`);
-    debug(`${JSON.stringify(self)}`);
-    return Keytar
-        .setPassword(
+    return setPassword(
             self._clientName,
             self.user,
             JSON.stringify(self)
@@ -137,7 +131,7 @@ class SecureClientInfo
     }
 }
 
-class SecureStore {
+class PersistenceManager {
     constructor(clientName) {
         this._clientName = clientName;
     }
@@ -150,5 +144,5 @@ class SecureStore {
 }
 
 export {
-    SecureStore as default
+    PersistenceManager as default
 }

@@ -11,7 +11,7 @@ import tlv from './lib/tlv.js';
 import enc from './lib/encryption';
 import Cryptographer from './lib/cryptographer';
 import AuthHeader from './lib/authorization';
-import SecureStore from './SecureStore';
+import SecureStore from './persistence-manager';
 
 const debug = require('debug')('hap-client:hap');
 
