@@ -1,6 +1,6 @@
 {
   "name": "hap-client",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Control HomeKit-enabled devices with Node",
   "main": "dist/HapClient.js",
   "repository": {
@@ -65,7 +65,7 @@
     "message-socket": "^1.0.3",
     "node-hkdf-sync": "^1.0.0",
     "rxjs": "^5.3.0",
-    "sodium": "^2.0.1",
+    "sodium": "^2.0.3",
     "source-map-support": "^0.4.15",
     "uuidv5": "^1.0.0"
   }
